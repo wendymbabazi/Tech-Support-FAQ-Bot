@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tech Support FAQ Bot</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .chat-container { background: white; width: 400px; max-width: 100%; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { background: #007bff; color: white; padding: 15px; font-size: 1.25rem; font-weight: bold; text-align: center; }
+    .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #e9ecef; display: flex; flex-direction: column; gap: 10px; }
+    .message { max-width: 80%; padding: 10px 15px; border-radius: 20px; line-height: 1.4; font-size: 1rem; word-wrap: break-word; }
+    .message.user { background-color: #007bff; color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+    .message.bot { background-color: #f1f1f1; color: #333; align-self: flex-start; border-bottom-left-radius: 0; }
+    .typing-indicator {
+      font-style: italic;
+      color: #888;
+      align-self: flex-start;
+      padding-left: 15px;
+    }
+    .chat-input { display: flex; border-top: 1px solid #ccc; padding: 10px; background: white; }
+    .chat-input input { flex: 1; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 20px; outline: none; margin-right: 10px; transition: border-color 0.3s; }
+    .chat-input input:focus { border-color: #007bff; }
+    .chat-input button { background: #007bff; border: none; color: white; padding: 10px 20px; border-radius: 20px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s; }
+    .chat-input button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <div class="chat-container" role="main" aria-label="Tech Support FAQ Chatbot">
+    <div class="chat-header">Tech Support FAQ Bot</div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
+    <form id="chatForm" class="chat-input" aria-label="Send a message">
+      <input type="text" id="userInput" placeholder="Type your question here..." aria-required="true" autocomplete="off" />
+      <button type="submit" aria-label="Send message">Send</button>
+    </form>
+  </div>
+
+<script>
+  (() => {
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+
+    const knowledgeBase = {
+      "how to reset password": "To reset your password, go to the login page and click 'Forgot Password'. Follow the instructions sent to your email.",
+      "how to connect to wifi": "To connect to Wi-Fi, open your network settings, select the network, and enter the password if prompted.",
+      "how to update software": "To update software, go to the settings or help menu and look for 'Check for updates' option.",
+      "printer not working": "Try restarting the printer and your computer. Check printer connections and ensure drivers are installed.",
+      "email not syncing": "Make sure your internet connection is stable, and check your email account settings.",
+      "how to contact support": "You can contact support via email at support@example.com or call 1-800-123-4567.",
+      "computer running slow": "Try restarting your computer, closing unused programs, and scanning for viruses or malware.",
+      "how to install software": "Download the installation package from a trusted source and follow the on-screen instructions.",
+      "forgot username": "Username recovery options depend on your system. Check if you can use your email address to log in or contact support.",
+      "how to backup data": "Use an external drive or cloud service to backup your important files regularly."
+    };
+
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender);
+      messageDiv.textContent = text;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.classList.add('typing-indicator');
+      typingDiv.id = 'typing-indicator';
+      typingDiv.textContent = 'Bot is typing...';
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return typingDiv;
+    }
+
+    function getAnswer(question) {
+      const q = question.trim().toLowerCase();
+      for (const key in knowledgeBase) {
+        if (q.includes(key)) {
+          return knowledgeBase[key];
+        }
+      }
+      return "Sorry, I don't have an answer for that. Please contact support.";
+    }
+
+    chatForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const question = userInput.value.trim();
+      if (!question) return;
+      addMessage(question, 'user');
+      userInput.value = '';
+      userInput.focus();
+
+      const typingDiv = addTypingIndicator();
+
+      setTimeout(() => {
+        typingDiv.remove();
+        const answer = getAnswer(question);
+        addMessage(answer, 'bot');
+      }, 1000); // 1 second delay to simulate typing
+    });
+
+    addMessage("Hi! I'm your Tech Support FAQ Bot. Ask me anything about common IT issues.", 'bot');
+  })();
+</script>
+</body>
+</html>
+
